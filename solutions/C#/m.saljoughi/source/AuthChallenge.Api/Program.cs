@@ -2,17 +2,31 @@ using AuthChallenge.Application.Abstractions;
 using AuthChallenge.Application.Services.Auth;
 using AuthChallenge.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
+builder.Services.AddSingleton<AuthSettings>(sp =>
+{
+    var auth = new AuthSettings();
+    builder.Configuration.GetSection("AuthSettings").Bind(auth);
+    return auth;
+});
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IScreeningRepository, ScreeningRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseNpgsql(
+        builder.Configuration.GetValue<string>("ConnectionString"),
+        postgreOptions =>
+        {
+        });
+});
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -29,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization(options =>
 {
-    foreach(var policy in AuthPolicies.All)
+    foreach (var policy in AuthPolicies.All)
     {
         options.AddPolicy(policy.policyName, policy.policy);
     }

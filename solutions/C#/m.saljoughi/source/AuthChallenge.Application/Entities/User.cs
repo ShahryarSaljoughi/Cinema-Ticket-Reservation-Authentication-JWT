@@ -12,4 +12,5 @@ public class User
     public string? PasswordHash { get; set; }
 
     public List<string> Scopes { get; set; } = [];
+    public List<string> Roles { get; set; } = [];
 }

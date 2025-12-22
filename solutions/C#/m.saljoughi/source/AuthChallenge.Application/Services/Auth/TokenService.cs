@@ -29,7 +29,7 @@ public class TokenService(IConfiguration config, AuthSettings authSettings) : IT
             new(ClaimTypes.Name, user.Username)
         };
         subjectClaims.AddRange(jwtAudience.Select(a => new Claim(JwtRegisteredClaimNames.Aud, a)));
-
+        subjectClaims.AddRange(user.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
         var scpClaimValue = string.Join(" ", user.Scopes);
         subjectClaims.Add(new Claim("scope", scpClaimValue));
 

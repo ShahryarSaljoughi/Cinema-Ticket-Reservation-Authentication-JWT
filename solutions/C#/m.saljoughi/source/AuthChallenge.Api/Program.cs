@@ -1,4 +1,5 @@
 using AuthChallenge.Application.Abstractions;
+using AuthChallenge.Application.Entities;
 using AuthChallenge.Application.Services.Auth;
 using AuthChallenge.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,6 +27,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         postgreOptions =>
         {
         });
+    options.UseAsyncSeeding(async (db, _, cancellationToken) =>
+    {
+        var customer = new User() { Name = "Korosh", Username = "Korosh", PasswordHash = "" };
+        db.Set<User>().AddRange();
+    });
 });
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();

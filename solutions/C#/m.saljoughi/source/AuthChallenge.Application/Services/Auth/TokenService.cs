@@ -7,9 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AuthChallenge.Application.Services.Auth;
 
-public class TokenService(IConfiguration config, AuthSettings authSettings) : ITokenService
+public class TokenService(AuthSettings authSettings) : ITokenService
 {
-    private IConfiguration Config { get; set; } = config;
     private AuthSettings AuthSettings { get; } = authSettings;
 
     public string GenerateAccessToken(User user)
